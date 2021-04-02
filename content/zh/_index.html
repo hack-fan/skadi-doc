@@ -1,0 +1,46 @@
++++
+title = "LetServerRun"
+linkTitle = "LetServerRun"
+
++++
+
+{{< blocks/cover title="用微信控制你的服务器" image_anchor="top" height="full" color="orange">}}
+	<div class="mx-auto">
+		<a class="btn btn-lg btn-primary mr-3 mb-4" href="{{< relref " /docs">}}">
+			文档 <i class="fas fa-arrow-alt-circle-right ml-2"></i>
+		</a>
+		<p class="lead mt-5">简单 安全 开源</p>
+		{{< blocks/link-down color="info">}}
+	</div>
+{{< /blocks/cover>}}
+
+
+{{% blocks/lead color="primary" %}}
+大家好，这个工具是我为个人开发者和小团队开发的，我自己就是第一个用户。
+
+我们一般会有着数量不多的服务器和线上服务。
+
+有的时候不在电脑边，想查看一下服务的状态，或者需要重启某个服务；
+
+有时候不太放心把私钥交给CI服务，又没有做部署的API，只能手动重部署；
+
+有时候服务有一点管理需求，但是又划不来做一个前端控制台。
+
+于是我做了这个小服务，让我可以把微信公众号当做一个简易的控制台随手使用。
+{{% /blocks/lead %}}
+
+{{< blocks/section color="dark">}}
+{{% blocks/feature icon="fa-lightbulb" title="简单" %}}
+关注公众号，根据引导在你的服务器复制粘贴几行命令就可以使用了。
+{{% /blocks/feature %}}
+
+
+{{% blocks/feature icon="fas fa-shield-alt" title="安全" %}}
+云端服务不会直接控制你的服务器，而只是暂存你的命令和消息等待服务器拉取。
+{{% /blocks/feature %}}
+
+
+{{% blocks/feature icon="fab fa-github" title="开源" %}}
+本项目是开源的。方便你审查你运行的代码，也为专业用户自己编写 Agent 提供参考。
+{{% /blocks/feature %}}
+{{< /blocks/section>}}
