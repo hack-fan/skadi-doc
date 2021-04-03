@@ -9,4 +9,5 @@ FROM caddy
 
 ENV TZ=Asia/Shanghai
 
+COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /src/public /srv
