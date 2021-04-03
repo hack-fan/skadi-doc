@@ -9,4 +9,4 @@ FROM caddy
 
 ENV TZ=Asia/Shanghai
 
-COPY --from=build public /srv
+COPY --from=build /src/public /srv
