@@ -7,17 +7,60 @@ description: >
     先最快的用起来，然后再慢慢配置。
 ---
 
-## 快速上手
+## 基本概念
 
-在关注服务号`LetServerRun`之后，通过命令`agent add 它的名字`增加一个 Agent。  
+```mermaid
+graph LR
+  im(服务号对话) --> c{{LetServerRun Cloud}}
+  c -- Agent主动拉取 --> a(Agent in your Server)
+  a -- Agent返回结果 --> c
+  c --> im
+```
+
+## 关注微信服务号
+
+在文档首页有二维码了，这里再贴一次吧，如果关注了请继续后边的步骤。
+
+![二维码](qrcode.jpg)
+
+关注后，输入`help`或者`帮助`看看一切是否正常。  
+
+## 第一个 Agent
+
+通过命令`agent add 它的名字`增加一个 Agent。  
 通过`status`命令，可以看到你加的这个 Agent 在离线状态。一个 Agent 如果三分钟以上没有心跳就会离线。  
-现在，我们根据用途，可以有多种方式部署一个 Agent，这里先使用一个 demo，它可以帮你执行配置文件中定义的命令。
 
-项目地址： github.com/hack-fan/skadi-agent-shell
+我们先使用一个[开源的通用 Agent](https://github.com/hack-fan/skadi-agent-shell)来上手。  
+它可以帮你在服务器执行特定的命令。后面我们可以根据需求，自己通过 API 或 SDK，集成 Agent 或自己编写。
 
-在 Releases 里边有编译好的文件，可以下载到你的 linux 服务器，按照 Readme 中的帮助启动它。
+假设你的服务器是 Debian/Ubuntu ,如果是别的请参考 [安装通用Agent](/docs/basic/common-agent/)  
+如果您本身就是 root 用户，麻烦去掉所有命令中的 `sudo`
 
-下面我们先说说发通知的功能，再继续讲各种类型的 Agent 。
+```bash
+# 注册仓库
+curl -1sLf \
+  'https://dl.cloudsmith.io/public/hackfan/skadi/setup.deb.sh' \
+  | sudo -E bash
+# 更新
+sudo apt update
+# 安装
+sudo apt install skadi
+```
+
+在安装后，因为还没有 Token，所以并没有自动启动。
+我们用 skadi 把之前公众号添加 Agent 得到的 Token 写入配置文件。
+你也可以编辑 `/etc/skadi/skadi.yml` 这个文件自己写入。
+
+```bash
+# 写入 Token
+sudo skadi AGENT-TOKEN
+# 启动服务
+sudo systemctl start
+```
+
+## 试用 Agent
+
+在公众号输入 `它的名字 help`
 
 ## 主动发送通知
 

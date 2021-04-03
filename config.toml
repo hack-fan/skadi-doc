@@ -191,3 +191,5 @@ enable = false
 	icon = "fab fa-github"
     desc = "主项目"
 
+[params.mermaid]
+enable = true
