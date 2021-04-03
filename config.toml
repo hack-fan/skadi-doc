@@ -58,7 +58,11 @@ anchor = "smart"
 
 # Language configuration
 
-# [languages]
+[languages]
+[languages.zh]
+languageName ="简体中文"
+time_format_default = "2006年2月1日"
+time_format_blog = "2006年2月1日"
 # [languages.en]
 # title = "Goldydocs"
 # description = "A Docsy example site"

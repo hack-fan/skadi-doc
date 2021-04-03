@@ -1,9 +1,10 @@
 ---
-title: "快速开始"
-linkTitle: "快速开始"
+title: '快速开始'
+linkTitle: '快速开始'
+url: 'docs/getting-started'
 weight: 2
 description: >
-  先最快的用起来，然后再慢慢配置。
+    先最快的用起来，然后再慢慢配置。
 ---
 
 ## 快速上手
