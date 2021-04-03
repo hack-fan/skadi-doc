@@ -1,3 +1,12 @@
-FROM klakegg/hugo:ext-alpine
+FROM klakegg/hugo:ext-alpine-ci as build
 
-RUN apk add git
+ADD . .
+
+RUN hugo
+
+
+FROM caddy
+
+ENV TZ=Asia/Shanghai
+
+COPY --from=build public /srv
