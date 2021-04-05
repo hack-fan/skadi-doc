@@ -42,9 +42,9 @@ curl -1sLf \
   'https://dl.cloudsmith.io/public/hackfan/skadi/setup.deb.sh' \
   | sudo -E bash
 # 更新
-sudo apt update
+apt update
 # 安装
-sudo apt install skadi
+apt install skadi
 ```
 
 在安装后，因为还没有 Token，所以并没有自动启动。
