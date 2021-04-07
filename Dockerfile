@@ -2,7 +2,7 @@ FROM klakegg/hugo:ext-alpine-ci as build
 
 ADD . .
 
-RUN npm i && hugo
+RUN npm i  --unsafe-perm && hugo
 
 
 FROM caddy
