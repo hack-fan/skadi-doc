@@ -50,11 +50,6 @@ anchor = "smart"
     url = "https://github.com/hack-fan/skadi/"
     pre = "<i class='fab fa-github'></i>"
     # post = "<span class='alert'>New!</span>" 
-[[menu.main]]
-    name = "API Reference"
-    weight = 40
-    url = "/ref/"
-    pre = "<i class='fas fa-laptop-code'></i>"
 
 [services]
 [services.googleAnalytics]

@@ -9,11 +9,9 @@ info:
 
         # 调用说明
 
-        ## 错误处理
-
         本文档描述的接口，如非特别注明，返回的 `HTTP Body` 总会是 `JSON` 格式。
 
-        ### 正常情况
+        ## 正常情况
 
         在正常情况下，返回的 `HTTP Status Code` 可能有：
 
@@ -24,7 +22,7 @@ info:
 
         正常情况返回的 `HTTP Body` 会直接是业务数据。
 
-        ### 异常情况
+        ## 异常情况
 
         如果出现异常，返回的 `HTTP Status Code` 可能有：
 
@@ -58,7 +56,7 @@ info:
         Bearer YOUR_TOKEN
         ```
         举例：
-        ```
+        ```bash
         curl --location --request GET 'https://api.letserver.run/agent/job' \
         --header 'Authorization: Bearer YOUR_AGENT_TOKEN'
         ```
