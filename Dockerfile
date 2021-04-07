@@ -2,7 +2,7 @@ FROM klakegg/hugo:ext-alpine-ci as build
 
 ADD . .
 
-RUN hugo
+RUN npm i && hugo
 
 
 FROM caddy
