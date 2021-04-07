@@ -1,0 +1,590 @@
+openapi: '3.0'
+info:
+    title: LetServerRun API
+    version: '1.0'
+    description: |-
+        这是 [LetServerRun](https://letserver.run) 的 HTTP API，
+        分为 User API 和 Agent API。
+        User API 可以在任意地方随意调用，Agent API 是用来完成 Agent 相关功能的。
+
+        # API 调用说明
+
+        ## 错误处理
+
+        本文档描述的接口，如非特别注明，返回的 `HTTP Body` 总会是 `JSON` 格式。
+
+        ### 正常情况
+
+        在正常情况下，返回的 `HTTP Status Code` 可能有：
+
+        * `200` OK 除下述情况外，正常返回 Code 都会是 200
+        * `201` Created 在 `POST` 接口创建了内容之后返回，这类接口不幂等，不能重复调用。
+        * `202` Accepted 所有的异步接口将直接返回 202 ，返回后服务器还会继续执行请求。
+        * `204` 在返回 Body 为空时 Code 会是 204，但 201 Body 为空时还会是 201
+
+        正常情况返回的 `HTTP Body` 会直接是业务数据。
+
+        ### 异常情况
+
+        如果出现异常，返回的 `HTTP Status Code` 可能有：
+
+        * `400` 请求的 `Query Param` 或 `Request Body` 有误。
+        * `401` 认证出错，注意，只有请求中包含了 Token ，且 Token 已失效才会触发此错误。请求时 Token 格式不对会返回 400 。
+        * `403` 认证信息是正确的，但没有权限访问此资源
+        * `404` 资源没有找到。值得注意的是，列表类接口空列表会返回 200 正常。
+        * `500` 服务端未预期的错误都会返回 500 ，一般不会出现，出现了就是 服务端有 bug 需要检查并修正。
+
+        异常情况总是会返回类似如下数据结构：
+        ```json
+        {
+          "error": "InvalidID",
+          "message": "need a valid agent id."
+        }
+        ```
+        这其中 `error` 是一个 `TitleCase` 格式的字符串，我们会在 API 文档中列出重要的 error 。
+        此字段可供客户端做条件判断决定处理流程。
+        `message` 则是语句式的说明。客户端可以作为日志使用，也可以在某些时候直接展示给客户。
+        鉴于本项目是多语言项目，大部分时候客户端可能都需要判断 `error` 进行本土化处理。
+
+
+        ## 接口认证
+        除了部分公开接口，其他接口都需要传递token.
+
+        **特别注意，User Token 和 Agent Token 是不一样的哦。**
+
+        在 Authorization Header 中携带如下内容就可以激活认证。
+
+        ```
+        Bearer YOUR_TOKEN
+        ```
+        举例：
+        ```
+        curl --location --request GET 'https://api.letserver.run/agent/job' \
+        --header 'Authorization: Bearer YOUR_AGENT_TOKEN'
+        ```
+
+tags:
+    - name: User
+      description: 包含用户相关的所有接口。
+    - name: Agent
+      description: Agent 可以发起的接口。
+servers:
+    - url: https://api.letserver.run
+      description: 官方云端
+
+security:
+    - BearerAuth: []
+
+paths:
+    /message/info:
+        post:
+            tags:
+                - User
+            summary: 发送提醒
+            description: |-
+                发送向自己公众号提醒，注意每小时有额度限制。
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: message-info-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/Message'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+        get:
+            security: []
+            tags:
+                - User
+            summary: 发送提醒（GET版）
+            description: |-
+                为了方便命令行调试，有这个GET版接口，token和msg当作参数输入，不用Header和Body
+            operationId: message-info-get
+            parameters:
+                - name: token
+                  in: query
+                  description: 你的 UserToken
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+                - name: msg
+                  in: query
+                  description: 消息内容
+                  required: true
+                  schema:
+                      type: string
+                  example: 'Hello World!'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /message/warning:
+        post:
+            tags:
+                - User
+            summary: 发送警告
+            description: |-
+                发送向自己公众号警告，注意每小时有额度限制。
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: message-warning-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/Message'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+        get:
+            security: []
+            tags:
+                - User
+            summary: 发送警告（GET版）
+            description: |-
+                为了方便命令行调试，有这个GET版接口，token和msg当作参数输入，不用Header和Body
+            operationId: message-warning-get
+            parameters:
+                - name: token
+                  in: query
+                  description: 你的 UserToken
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+                - name: msg
+                  in: query
+                  description: 消息内容
+                  required: true
+                  schema:
+                      type: string
+                  example: 'Hello World!'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/job:
+        get:
+            tags:
+                - Agent
+            summary: 接收Job
+            description: |-
+                从云端拉取Job，兼职心跳的功能，如果是204就没有Job，有的话就是200并用body返回Job。
+                三分钟没有心跳Agent会被判定为离线。建议一分钟拉取一次。
+                请注意不要分布式部署Agent，那样会n个实例一起拉取，需要备份的话部署两份就足够了。
+            operationId: agent-job-get
+            responses:
+                '200':
+                    description: 取到一个Job
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Job'
+                '204':
+                    description: 没有Job
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/jobs/{id}/succeed:
+        put:
+            tags:
+                - Agent
+            summary: '报告执行成功'
+            description: |-
+                在报告后，会在发起任务的地方收到成功提示。
+                可能的错误： JobFinished ，已经完成的任务不能再次报告。
+            operationId: agent-jobs-succeed-put
+            parameters:
+                - name: id
+                  in: path
+                  description: JobID
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/Result'
+            responses:
+                '204':
+                    description: OK
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '404':
+                    description: Not Found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error404'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/jobs/{id}/fail:
+        put:
+            tags:
+                - Agent
+            summary: '报告执行失败'
+            description: |-
+                在报告后，会在发起任务的地方收到失败提示。
+                可能的错误： JobFinished ，已经完成的任务不能再次报告。
+            operationId: agent-jobs-fail-put
+            parameters:
+                - name: id
+                  in: path
+                  description: JobID
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/Result'
+            responses:
+                '204':
+                    description: OK
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '404':
+                    description: Not Found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error404'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/jobs/{id}/running:
+        put:
+            tags:
+                - Agent
+            summary: '报告执行进行中'
+            description: |-
+                在报告后，会在发起任务的地方收到进度提示。
+            operationId: agent-jobs-running-put
+            parameters:
+                - name: id
+                  in: path
+                  description: JobID
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/Result'
+            responses:
+                '204':
+                    description: OK
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '404':
+                    description: Not Found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error404'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/info:
+        post:
+            tags:
+                - Agent
+            summary: 发送提醒
+            description: |-
+                发送向自己公众号提醒，注意每小时有额度限制。
+                Agent版本和User版本的区别是会自动携带来源，但是不能定义颜色。
+                另一个区别是Agent版本返回成功不代表最终成功，只是进入了发送队列。
+                User版本是同步接口。
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: agent-info-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/AgentMessage'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/warning:
+        post:
+            tags:
+                - Agent
+            summary: 发送警告
+            description: |-
+                发送向自己公众号警告，注意每小时有额度限制。
+                Agent版本和User版本的区别是会自动携带来源，但是不能定义颜色。
+                另一个区别是Agent版本返回成功不代表最终成功，只是进入了发送队列。
+                User版本是同步接口。
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: agent-warning-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/AgentMessage'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+
+# models
+components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+    schemas:
+        Error:
+            type: object
+            required:
+                - error
+                - message
+            properties:
+                error:
+                    type: string
+                    description: TitleCase string, error type.
+                    example: InvalidQueryParam
+                message:
+                    type: string
+                    description: error message.
+                    example: please provide correct query parameters.
+        Error429:
+            type: object
+            required:
+                - error
+                - message
+            properties:
+                error:
+                    type: string
+                    description: TitleCase string, error type.
+                    example: LimitExceeded
+                message:
+                    type: string
+                    description: error message.
+                    example: 请求次数超限，您每小时有5次配额，将在24m13s后恢复
+        Error404:
+            type: object
+            required:
+                - error
+                - message
+            properties:
+                error:
+                    type: string
+                    description: TitleCase string, error type.
+                    example: NotFound
+                message:
+                    type: string
+                    description: error message.
+                    example: Record not found.
+        Error500:
+            type: object
+            required:
+                - error
+                - message
+            properties:
+                error:
+                    type: string
+                    description: TitleCase string, error type.
+                    example: ServerError
+                message:
+                    type: string
+                    description: error message.
+                    example: Please contact your system administrator or submit an github issue report.
+        Message:
+            type: object
+            required:
+                - message
+            properties:
+                message:
+                    type: string
+                    description: 要发送的消息
+                    example: 'Hello World!'
+                source:
+                    type: string
+                    description: 消息来源，可以为空
+                    example: 'github action'
+                color:
+                    type: string
+                    description: 颜色，十六进制表示，可以为空
+                    example: '#000000'
+        AgentMessage:
+            type: object
+            required:
+                - message
+            properties:
+                message:
+                    type: string
+                    description: 要发送的消息
+                    example: 'Hello World!'
+        Job:
+            type: object
+            required:
+                - id
+                - message
+            properties:
+                id:
+                    type: string
+                    description: ID可以用来做后续操作
+                    example: 'bqfpcg74sndh26t10h40'
+                message:
+                    type: string
+                    description: 收到的消息
+                    example: '重启'
+        Result:
+            type: object
+            properties:
+                result:
+                    type: string
+                    description: 执行结果。正确，错误，过程都用这个字段提交。
+                    example: '重启成功'
