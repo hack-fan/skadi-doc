@@ -53,7 +53,8 @@ anchor = "smart"
 [[menu.main]]
     name = "API Reference"
     weight = 40
-    url = "/ref"
+    url = "/ref/"
+    pre = "<i class='fas fa-laptop-code'></i>"
 
 [services]
 [services.googleAnalytics]
