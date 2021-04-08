@@ -1,7 +1,7 @@
 openapi: '3.0'
 info:
     title: LetServerRun API
-    version: '1.0'
+    version: '1.1'
     description: |-
         这是 [LetServerRun](https://letserver.run) 的 HTTP API，
         分为 User API 和 Agent API。
@@ -80,7 +80,7 @@ paths:
                 - User
             summary: 发送提醒
             description: |-
-                发送向自己公众号提醒，注意每小时有额度限制。
+                发送向自己公众号提醒，注意每小时有额度限制。  
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
@@ -161,7 +161,7 @@ paths:
                 - User
             summary: 发送警告
             description: |-
-                发送向自己公众号警告，注意每小时有额度限制。
+                发送向自己公众号警告，注意每小时有额度限制。  
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
@@ -236,14 +236,97 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error500'
+    /message/text:
+        post:
+            tags:
+                - User
+            summary: 发送纯文本
+            description: |-
+                **警告**：这个接口比较特殊，不要让程序主动调用。它必须和公众号互动后才能使用。  
+                发送向公众号纯文本会话消息，注意你每次跟公众号说话后，会再48小时内有20条权限。  
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: message-warning-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/TextMessage'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+        get:
+            security: []
+            tags:
+                - User
+            summary: 发送文本（GET版）
+            description: |-
+                **警告**：这个接口比较特殊，不要让程序主动调用。它必须和公众号互动后才能使用。  
+                为了方便命令行调试，有这个GET版接口，token和msg当作参数输入，不用Header和Body
+            operationId: message-warning-get
+            parameters:
+                - name: token
+                  in: query
+                  description: 你的 UserToken
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+                - name: msg
+                  in: query
+                  description: 消息内容
+                  required: true
+                  schema:
+                      type: string
+                  example: 'Hello World!'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
     /agent/job:
         get:
             tags:
                 - Agent
             summary: 接收Job
             description: |-
-                从云端拉取Job，兼职心跳的功能，如果是204就没有Job，有的话就是200并用body返回Job。
-                三分钟没有心跳Agent会被判定为离线。建议一分钟拉取一次。
+                从云端拉取Job，兼职心跳的功能，如果是204就没有Job，有的话就是200并用body返回Job。  
+                三分钟没有心跳Agent会被判定为离线。建议一分钟拉取一次。  
                 请注意不要分布式部署Agent，那样会n个实例一起拉取，需要备份的话部署两份就足够了。
             operationId: agent-job-get
             responses:
@@ -273,7 +356,7 @@ paths:
                 - Agent
             summary: '报告执行成功'
             description: |-
-                在报告后，会在发起任务的地方收到成功提示。
+                在报告后，会在发起任务的地方收到成功提示。  
                 可能的错误： JobFinished ，已经完成的任务不能再次报告。
             operationId: agent-jobs-succeed-put
             parameters:
@@ -316,7 +399,7 @@ paths:
                 - Agent
             summary: '报告执行失败'
             description: |-
-                在报告后，会在发起任务的地方收到失败提示。
+                在报告后，会在发起任务的地方收到失败提示。  
                 可能的错误： JobFinished ，已经完成的任务不能再次报告。
             operationId: agent-jobs-fail-put
             parameters:
@@ -359,7 +442,11 @@ paths:
                 - Agent
             summary: '报告执行进行中'
             description: |-
-                在报告后，会在发起任务的地方收到进度提示。
+                **警告**：这个接口比较特殊。  
+                它有两个功能，1.刷新云端10分钟的任务超时计时，2.给任务来源报告。  
+                刷新是肯定会执行的，报告则是异步执行的不会返回错误，它的规则如下。  
+                如果任务来源是公众号，那么你最多可以报告17次。如果报告满20次，将无法收到后续成功/失败提醒。  
+                超过20次之后消息会被忽略，当然，你如果期间和公众号又对话过，会刷新这个次数。
             operationId: agent-jobs-running-put
             parameters:
                 - name: id
@@ -401,10 +488,10 @@ paths:
                 - Agent
             summary: 发送提醒
             description: |-
-                发送向自己公众号提醒，注意每小时有额度限制。
-                Agent版本和User版本的区别是会自动携带来源，但是不能定义颜色。
-                另一个区别是Agent版本返回成功不代表最终成功，只是进入了发送队列。
-                User版本是同步接口。
+                发送向自己公众号提醒，注意每小时有额度限制。  
+                Agent版本和User版本的区别是会自动携带来源，但是不能定义颜色。  
+                另一个区别是Agent版本返回成功不代表最终成功，只是进入了发送队列。  
+                User版本是同步接口。  
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
@@ -413,10 +500,10 @@ paths:
                 content:
                     'application/json':
                         schema:
-                            $ref: '#/components/schemas/AgentMessage'
+                            $ref: '#/components/schemas/TextMessage'
             responses:
-                '201':
-                    description: 成功发送
+                '202':
+                    description: 任务已经安排上了
                 '400':
                     description: BadRequest
                     content:
@@ -441,10 +528,10 @@ paths:
                 - Agent
             summary: 发送警告
             description: |-
-                发送向自己公众号警告，注意每小时有额度限制。
-                Agent版本和User版本的区别是会自动携带来源，但是不能定义颜色。
-                另一个区别是Agent版本返回成功不代表最终成功，只是进入了发送队列。
-                User版本是同步接口。
+                发送向自己公众号警告，注意每小时有额度限制。  
+                Agent版本和User版本的区别是会自动携带来源，但是不能定义颜色。  
+                另一个区别是Agent版本返回成功不代表最终成功，只是进入了发送队列。  
+                User版本是同步接口。  
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
@@ -453,10 +540,52 @@ paths:
                 content:
                     'application/json':
                         schema:
-                            $ref: '#/components/schemas/AgentMessage'
+                            $ref: '#/components/schemas/TextMessage'
             responses:
-                '201':
-                    description: 成功发送
+                '202':
+                    description: 任务已经安排上了
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/text:
+        post:
+            tags:
+                - Agent
+            summary: 发送文本
+            description: |-
+                **警告**：如果目标是公众号，这个接口比较特殊。  
+                它只能在和公众号有互动后，48小时内发送20条消息。  
+                所以已经保证在收到任务之后再调用这个接口，不能随意主动调用。  
+                如果没有消息额度时，会静默丢失，什么都不会发生。  
+                这个接口和 /agent/jobs/:id/running 接口的区别是：  
+                job的接口会有一行正在执行字样，这个接口发送的就是最终看到的文本。  
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: agent-warning-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/TextMessage'
+            responses:
+                '202':
+                    description: 任务已经安排上了
                 '400':
                     description: BadRequest
                     content:
@@ -556,7 +685,7 @@ components:
                     type: string
                     description: 颜色，十六进制表示，可以为空
                     example: '#000000'
-        AgentMessage:
+        TextMessage:
             type: object
             required:
                 - message
