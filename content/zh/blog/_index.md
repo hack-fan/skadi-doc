@@ -4,5 +4,5 @@ linkTitle: 'Blog'
 menu:
     main:
         weight: 40
-        pre: <i class="far fa-list-alt"></i>
+        pre: <i class="fas fa-list"></i>
 ---

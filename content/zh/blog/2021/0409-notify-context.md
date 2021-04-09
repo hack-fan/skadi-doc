@@ -21,7 +21,7 @@ tags: ['Go']
 
 在以前，大概是这么写：
 
-```golang
+```go
 func everLoop(ctx context.Context) {
 LOOP:
     for {
@@ -59,7 +59,7 @@ func main() {
 
 现在有了新的函数，这一段变得更简单了：
 
-```golang
+```go
 func main() {
     // 监控系统信号和创建 Context 现在一步搞定
     ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -78,8 +78,7 @@ func main() {
 
 最后，我是写最新的项目[LetServerRun](https://letserver.run)的时候，发现这种最新的写法的。
 LetServerRun 可以让你把微信公众号当作随身的 Terminal 控制你的服务端。
-在它的 [Agent](https://github.com/hack-fan/skadi-agent-shell) 的 main 函数中就有上述用法的示例，
-欢迎参考。
+在它的 [Agent](https://github.com/hack-fan/skadi-agent-shell) 的 main 函数中就有上述用法的示例，欢迎参考。
 
 附上 LetServerRun 的服务号二维码，感兴趣的同学可以关注一下：
 
