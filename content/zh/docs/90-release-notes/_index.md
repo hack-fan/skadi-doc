@@ -4,8 +4,21 @@ linkTitle: '更新说明'
 url: 'docs/release-notes'
 weight: 9
 description: >
-    能看得懂的更新说明。
+    我要写一份大家能看得懂的更新说明。
 ---
+
+## 2021年4月12日
+
+新增功能
+
+* Agent上线和离线事件现在会在公众号通知了
+
+改动
+
+* 现在会校验各种输入的信息了，不符合要求会有更友好的错误提示。
+* [Golang SDK](https://github.com/hack-fan/skadigo)被重构，现在handler可以得到任务id，用以阶段汇报
+* [开源Agent](https://github.com/hack-fan/skadi-agent-shell)现在在token错误时会退出并不再重启
+* [开源Agent](https://github.com/hack-fan/skadi-agent-shell)现在在任务执行失败时会返回错误输出
 
 ## 2021年4月10日 初始版本
 
