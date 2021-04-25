@@ -1,7 +1,7 @@
 openapi: '3.0'
 info:
     title: LetServerRun API
-    version: '1.1'
+    version: '1.2'
     description: |-
         这是 [LetServerRun](https://letserver.run) 的 HTTP API，
         分为 User API 和 Agent API。
@@ -247,7 +247,7 @@ paths:
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
-            operationId: message-warning-post
+            operationId: message-text-post
             requestBody:
                 content:
                     'application/json':
@@ -282,7 +282,88 @@ paths:
             description: |-
                 **警告**：这个接口比较特殊，不要让程序主动调用。它必须和公众号互动后才能使用。  
                 为了方便命令行调试，有这个GET版接口，token和msg当作参数输入，不用Header和Body
-            operationId: message-warning-get
+            operationId: message-text-get
+            parameters:
+                - name: token
+                  in: query
+                  description: 你的 UserToken
+                  required: true
+                  schema:
+                      type: string
+                  example: bqbvu8v4sndh26t10g30
+                - name: msg
+                  in: query
+                  description: 消息内容
+                  required: true
+                  schema:
+                      type: string
+                  example: 'Hello World!'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /message/auto:
+        post:
+            tags:
+                - User
+            summary: 自动选择
+            description: |-
+                这是 text 和 info 接口的自动版本，如果能直接回复消息，就用普通微信消息，如果不能，则用模版消息发送。
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: message-auto-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/TextMessage'
+            responses:
+                '201':
+                    description: 成功发送
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+        get:
+            security: []
+            tags:
+                - User
+            summary: 自动选择（GET版）
+            description: |-
+                这是 text 和 info 接口的自动版本，如果能直接回复消息，就用普通微信消息，如果不能，则用模版消息发送。
+                为了方便命令行调试，有这个GET版接口，token和msg当作参数输入，不用Header和Body
+            operationId: message-auto-get
             parameters:
                 - name: token
                   in: query
