@@ -1,7 +1,7 @@
 openapi: '3.0'
 info:
     title: LetServerRun API
-    version: '1.3'
+    version: '1.4'
     description: |-
         这是 [LetServerRun](https://letserver.run) 的 HTTP API，
         分为 User API 和 Agent API。
@@ -625,6 +625,43 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error404'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/job/add:
+        post:
+            tags:
+                - Agent
+            summary: 发任务
+            description: |-
+                效果和在 IM 中发送文本消息一样，Message 格式为 <Agent名字> 空格 <任务内容>  
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: agent-message-info-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/TextMessage'
+            responses:
+                '202':
+                    description: 任务已经安排上了
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
                 '500':
                     description: ServerError
                     content:
