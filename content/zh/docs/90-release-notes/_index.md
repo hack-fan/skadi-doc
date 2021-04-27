@@ -7,6 +7,17 @@ description: >
     我要写一份大家能看得懂的更新说明。
 ---
 
+## 2021年4月27日
+
+新增功能
+
+* 新增 `/agent/message/auto` 接口，让 Agent 也能使用自动适配发送方式的消息。
+* 新增 `/agent/job/add` POST 接口，让 Agent 可以给别的 Agent 发送任务了。
+
+改动
+
+* Break API: 所有的 Agent 发送消息的接口统一了前缀为 `/agent/message/`
+
 ## 2021年4月25日
 
 新增功能
