@@ -631,7 +631,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error500'
-    /agent/info:
+    /agent/message/info:
         post:
             tags:
                 - Agent
@@ -644,7 +644,7 @@ paths:
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
-            operationId: agent-info-post
+            operationId: agent-message-info-post
             requestBody:
                 content:
                     'application/json':
@@ -671,7 +671,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error500'
-    /agent/warning:
+    /agent/message/warning:
         post:
             tags:
                 - Agent
@@ -684,7 +684,7 @@ paths:
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
-            operationId: agent-warning-post
+            operationId: agent-message-warning-post
             requestBody:
                 content:
                     'application/json':
@@ -711,7 +711,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error500'
-    /agent/text:
+    /agent/message/text:
         post:
             tags:
                 - Agent
@@ -726,7 +726,44 @@ paths:
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
-            operationId: agent-warning-post
+            operationId: agent-message-text-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/TextMessage'
+            responses:
+                '202':
+                    description: 任务已经安排上了
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/message/auto:
+        post:
+            tags:
+                - Agent
+            summary: 发送自适配
+            description: |-
+                这个接口会先调用 text 版本发客服消息，失败后会调用 info 接口发模版消息。
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: agent-message-auto-post
             requestBody:
                 content:
                     'application/json':
