@@ -2,7 +2,7 @@
 title: '给自己发送通知'
 linkTitle: '发送通知'
 url: 'docs/basic/notify'
-weight: 43
+weight: 41
 description: >
     轻松给自己的微信发送通知。
 ---
@@ -16,7 +16,7 @@ description: >
 
 现在调用发送消息的 API 就可以往公众号发送消息了
 
-```http
+```text
 GET https://api.letserver.run/message/info?token=YOUR-TOKEN&msg=hello
 ```
 
