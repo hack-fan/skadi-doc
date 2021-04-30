@@ -1,7 +1,7 @@
 openapi: '3.0'
 info:
     title: LetServerRun API
-    version: '1.4'
+    version: '1.5'
     description: |-
         这是 [LetServerRun](https://letserver.run) 的 HTTP API，
         分为 User API 和 Agent API。
@@ -641,15 +641,54 @@ paths:
                 这个接口可能返回如下错误:
                   * `BadRequest`: 传入的body结构不正确
                   * `LimitExceeded`: 配额超限，这个 status code 是429
-            operationId: agent-message-info-post
+            operationId: agent-job-add-post
             requestBody:
                 content:
                     'application/json':
                         schema:
                             $ref: '#/components/schemas/TextMessage'
             responses:
-                '202':
-                    description: 任务已经安排上了
+                '201':
+                    description: 已创建
+                '400':
+                    description: BadRequest
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '429':
+                    description: LimitExceeded
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error429'
+                '500':
+                    description: ServerError
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error500'
+    /agent/job/delayed:
+        post:
+            tags:
+                - Agent
+            summary: 延迟任务
+            description: |-
+                给自己发一个延迟任务，任务内容不含自己的名字。将在指定的时间后收到这个任务。  
+                duration 可以为 `1h2m3s` 这种形式，只支持时分秒。有 duration 的时候其他数字时间无效。  
+                没有 duration 时会将提供的 days hours minutes 相加当作延后时间。  
+                这个接口可能返回如下错误:
+                  * `BadRequest`: 传入的body结构不正确
+                  * `LimitExceeded`: 配额超限，这个 status code 是429
+            operationId: agent-job-delayed-post
+            requestBody:
+                content:
+                    'application/json':
+                        schema:
+                            $ref: '#/components/schemas/DelayedJobInput'
+            responses:
+                '201':
+                    description: 已创建
                 '400':
                     description: BadRequest
                     content:
@@ -938,3 +977,25 @@ components:
                     type: string
                     description: 执行结果。正确，错误，过程都用这个字段提交。
                     example: '重启成功'
+        DelayedJobInput:
+            type: object
+            required:
+                - message
+            properties:
+                message:
+                    type: string
+                    description: 任务内容
+                    example: '重启'
+                duration:
+                    type: string
+                    description: 延迟时间
+                    example: '360h'
+                minutes:
+                    type: integer
+                    description: 分钟数
+                hours:
+                    type: integer
+                    description: 小时数
+                days:
+                    type: integer
+                    description: 天数
