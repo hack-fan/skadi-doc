@@ -7,16 +7,6 @@ description: >
     先最快的用起来，然后再慢慢配置。
 ---
 
-## 基本概念
-
-```mermaid
-graph LR
-  im(服务号对话) --> c{{Server饭 Cloud}}
-  c -- Agent主动拉取 --> a(Agent in your Server)
-  a -- Agent返回结果 --> c
-  c --> im
-```
-
 ## 关注微信服务号
 
 在文档首页有二维码了，这里再贴一次吧，如果关注了请继续后边的步骤。
@@ -24,6 +14,34 @@ graph LR
 ![二维码](qrcode.jpg)
 
 关注后，输入`help`或者`帮助`看看一切是否正常。  
+
+## 主动发送通知
+
+给自己发消息是最常用的功能，
+在服务号发送 `token` 命令查看自己的用户 token 。
+
+使用用户 token，您就可以用 API 向公众号发警告消息了：
+
+```bash
+curl "https://api.letserver.run/message/info?token=YOUR-TOKEN&msg=hello"
+```
+
+PS. 这个 GET 接口是为了调试和轻量使用场景的，在程序中使用的话有更完善的 POST 接口，SDK 也支持主动发消息。
+
+## 反向控制原理
+
+发送通知的服务很多，Server饭 的特色功能是反向用微信控制服务器做简单的事情。
+放心，不需要你提供ssh密钥，为了安全，命令能做什么完全由你定义。
+
+下面是反向控制的大概原理：
+
+```mermaid
+graph LR
+  IM(服务号对话) --> c{{Server饭}}
+  c -- 拉取命令 --> a(Agent)
+  a -- 返回结果 --> c
+  c --> IM
+```
 
 ## 第一个 Agent
 
@@ -58,12 +76,12 @@ sudo skadi AGENT-TOKEN
 sudo systemctl start
 ```
 
-只有第一次需要手动启动服务
+只有第一次需要配置Token后手动启动服务，服务器重启它是会依靠systemd自己启动的。
 
 ## 试用 Agent
 
 在公众号输入 `它的名字 help` ，在一分钟之内，命令会被Agent拉走并返回结果。  
-这个官方的通用 Agent 功能由 `/etc/skadi/skadi.yml` 这个配置文件定义。
+这个官方的通用 Agent 功能由你部署它的服务器上的 `/etc/skadi/skadi.yml` 这个配置文件定义。
 
 然后你可以顺次输入`名字 date`,`名字 lsroot`,`名字 free -m`,`名字 Hi Fool`,
 去试用，接下来，更改配置文件就可以完成重启服务，查看状态等简单的动作了。
@@ -107,17 +125,8 @@ sudo systemctl restart skadi
 
 ## 编写自己的 Agent
 
-你可以根据我们公开的 API 和 SDK 用各种语言编写自己的 Agent  
-或者直接在服务中集成一个 Agent 实例，就可以把微信当作简单的业务控制台了。
+如果是控制集群重启之类的，使用我们的 Agent 就够用了。
 
-## 额外功能 主动发送通知
+如果想实现更多的功能，可能需要你自己根据开放接口写一个 Agent 。
 
-除了在公众号发命令让 Agent 代为执行并返回结果这一功能，我们当然还有让您主动调用 API 往公众号发通知的功能。您可以在服务号发送 `token` 命令查看自己的用户 token 。
-
-使用用户 token，您就可以用 API 向公众号发警告消息了：
-
-```bash
-curl "https://api.letserver.run/message/info?token=YOUR-TOKEN&msg=hello"
-```
-
-这个 GET 接口是为了调试和轻量使用场景的，在程序中使用的话有更完善的 POST 接口，SDK 也支持主动发消息。
+甚至直接在服务中集成一个 Agent 实例，就可以把微信当作简单的业务控制台了。
