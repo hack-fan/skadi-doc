@@ -11,7 +11,7 @@ description: >
 
 ```mermaid
 graph LR
-  im(服务号对话) --> c{{LetServerRun Cloud}}
+  im(服务号对话) --> c{{Server饭 Cloud}}
   c -- Agent主动拉取 --> a(Agent in your Server)
   a -- Agent返回结果 --> c
   c --> im

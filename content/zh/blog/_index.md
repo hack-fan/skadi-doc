@@ -1,5 +1,5 @@
 ---
-title: 'LetServerRun 的技术博客'
+title: 'Server饭 的技术博客'
 linkTitle: 'Blog'
 menu:
     main:

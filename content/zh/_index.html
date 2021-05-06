@@ -1,10 +1,10 @@
 +++
-title = "LetServerRun"
-linkTitle = "LetServerRun"
+title = "Server饭"
+linkTitle = "Server饭"
 
 +++
 
-{{< blocks/cover title="用微信控制你的服务器" image_anchor="top" height="full" color="orange">}}
+{{< blocks/cover title="Server饭" image_anchor="top" height="full" color="orange">}}
 	<div class="mx-auto">
 		<a class="btn btn-lg btn-primary mr-3 mb-4" href="{{< relref "/docs">}}">
 			看文档 <i class="fas fa-arrow-alt-circle-right ml-2"></i>
@@ -12,38 +12,32 @@ linkTitle = "LetServerRun"
 		<a class="btn btn-lg btn-primary mr-3 mb-4" href="https://github.com/hack-fan/skadi">
 			Github <i class="fab fa-github ml-2 "></i>
 		</a>
-		<p class="lead mt-5">简单 强大 安全 开源</p>
+		<p class="lead mt-5">服务器给微信发通知消息 或用微信控制你的服务器</p>
 		{{< blocks/link-down color="info">}}
 	</div>
 {{< /blocks/cover>}}
 
 
 {{% blocks/lead color="primary" %}}
-大家好，这个工具是我为个人开发者和小团队开发的，我自己就是第一个用户。
+一个微信和服务器双向通讯的方案
 
-我们一般会有数量不多的一些云服务器和线上服务。
+你可以让服务器，应用，路由器，PC，CI服务等给你自己发消息
 
-有时候不在电脑边，想查看一下服务状态或者需要重启某个服务；
-
-有时候不太放心把私钥交给CI系统，又没有用来部署的API，只能手动重部署；
-
-有时候会有一点管理需求，但是做一个前端控制台又不划算（其实是不会）。
-
-所以我做了这个小服务，让我们可以把微信公众号当做一个控制台随手使用。
+也可以在微信公众号发命令给它们
 {{% /blocks/lead %}}
 
 {{< blocks/section color="dark">}}
-{{% blocks/feature icon="fa-lightbulb" title="简单" %}}
-关注 LetServerRun，根据引导在云服务器复制粘贴几行命令就可以开始使用。
+{{% blocks/feature icon="fa-lightbulb" title="消息推送" %}}
+在任何地方通过简单的配置，在发生大事时向你的微信上发送通知。
 {{% /blocks/feature %}}
 
 
-{{% blocks/feature icon="fas fa-shield-alt" title="安全" %}}
-云端服务不会直接控制你的服务器，而只是暂存你的命令和消息等待服务器拉取。
+{{% blocks/feature icon="fas fa-shield-alt" title="远程控制" %}}
+比如你对公众号说：良心云 重启。你预先指定的良心云上的服务就重启更新了。
 {{% /blocks/feature %}}
 
 
-{{% blocks/feature icon="fab fa-github" title="开源" %}}
-开源项目是方便你审查所运行的代码，也为专业用户自己编写 Agent 提供参考。
+{{% blocks/feature icon="fab fa-github" title="开放生态" %}}
+所有的操作都有对应的API可以完成，让你可以任意集成或二次开发。
 {{% /blocks/feature %}}
 {{< /blocks/section>}}

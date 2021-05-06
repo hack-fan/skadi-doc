@@ -1,9 +1,9 @@
 openapi: '3.0'
 info:
-    title: LetServerRun API
+    title: Server饭 API
     version: '1.5'
     description: |-
-        这是 [LetServerRun](https://letserver.run) 的 HTTP API，
+        这是 [Server饭](https://letserver.run) 的 HTTP API，
         分为 User API 和 Agent API。
         User API 可以在任意地方随意调用，Agent API 是用来完成 Agent 相关功能的。
 

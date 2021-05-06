@@ -1,5 +1,5 @@
 ---
-title: '欢迎使用 LetServerRun'
+title: '欢迎使用 Server饭'
 linkTitle: '文档'
 weight: 20
 menu:
@@ -8,7 +8,7 @@ menu:
         pre: <i class='fas fa-book'></i>
 ---
 
-感谢你能来到这里，查看 LetServerRun 的文档。这个小服务适合个人、独立开发者或者小团队简单管理自己的服务器或云端服务。
+感谢你能来到这里，查看 Server饭 的文档。这个小服务适合个人、独立开发者或者小团队简单管理自己的服务器或云端服务。
 在国内用微信真的很方便，也不用装什么别的 App，目前只能把我们的服务号`LetServerRun`当作控制台。
 
 ## 直观印象

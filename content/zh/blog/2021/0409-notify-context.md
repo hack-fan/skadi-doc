@@ -76,10 +76,10 @@ func main() {
 感谢 `Golang` ，当年用别的语言需要写一大堆代码的功能，现在几行就可以轻松实现了。
 让它成为你服务程序的标配吧。
 
-最后，我是写最新的项目[LetServerRun](https://letserver.run)的时候，发现这种最新的写法的。
-LetServerRun 可以让你把微信公众号当作随身的 Terminal 控制你的服务端。
+最后，我是写最新的项目[Server饭](https://letserver.run)的时候，发现这种最新的写法的。
+Server饭 可以让你把微信公众号当作随身的 Terminal 控制你的服务端。
 在它的 [Agent](https://github.com/hack-fan/skadi-agent-shell) 的 main 函数中就有上述用法的示例，欢迎参考。
 
-附上 LetServerRun 的服务号二维码，感兴趣的同学可以关注一下：
+附上 Server饭 的服务号二维码，感兴趣的同学可以关注一下：
 
 ![LetServerRun](https://static.crandom.com/hackfan/letserverrun.jpg)

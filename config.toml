@@ -1,5 +1,5 @@
 baseURL = "/"
-title = "Let Server Run"
+title = "Server饭"
 
 enableRobotsTXT = true
 
@@ -96,7 +96,7 @@ time_format_blog = "2006年1月2日"
 section = ["HTML", "print"]
 
 [params]
-copyright = "Hack Fan Team"
+copyright = "Hack.Fan"
 privacy_policy = "https://beian.miit.gov.cn/"
 
 # First one is picked as the Twitter card image if not set on page.
