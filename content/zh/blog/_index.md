@@ -1,6 +1,6 @@
 ---
-title: 'Server饭 的技术博客'
-linkTitle: 'Blog'
+title: 'Server饭的技术分享'
+linkTitle: '技术分享'
 menu:
     main:
         weight: 40
