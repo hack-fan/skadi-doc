@@ -2,7 +2,7 @@
 title: '一些零碎的小技巧'
 linkTitle: '小技巧'
 url: 'docs/cookbook/tips'
-weight: 51
+weight: 59
 description: >
     也许能给你些提示
 ---
