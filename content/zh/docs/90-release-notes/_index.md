@@ -9,6 +9,10 @@ description: >
 
 ## 2021年8月19日
 
+新增功能
+
+* 增加了一个官方的 Github Action
+
 改动
 
 * 默认 Agent `skadi-agent-shell` 检查任务间隔从1分钟降低到10秒。
